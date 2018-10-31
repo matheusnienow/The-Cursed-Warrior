@@ -9,13 +9,18 @@ public class PlatformerPlayer : MonoBehaviour {
 
     private Rigidbody2D _body;
     private Animator _anim;
-    private BoxCollider2D _box;
+    private Collider2D _box;
+
+
+    /// <summary>
+    /// ARRUMAR O ANIMATION CONTROLLER PARA A ANIMAÇÃO DE JUMP, SETAR A VARIAVEL BOLEANA DE UMA MANEIRA QUE VÁ FUNCIONAR
+    /// </summary>
 
     // Use this for initialization
     void Start () {
         _body = GetComponent<Rigidbody2D>();
         _anim = GetComponent<Animator>();
-        _box = GetComponent<BoxCollider2D>();
+        _box = GetComponent<CapsuleCollider2D>();
 	}
 	
 	// Update is called once per frame
@@ -44,11 +49,12 @@ public class PlatformerPlayer : MonoBehaviour {
         Vector2 corner2 = new Vector2(min.x, min.y - 0.2f);
         Collider2D hit = Physics2D.OverlapArea(corner1, corner2);
         bool isGounded = false;
-
         if (hit != null)
         {
             isGounded = true;
         }
+
+        _anim.SetBool("isGrounded", isGounded);
         return isGounded;
     }
 
@@ -57,6 +63,8 @@ public class PlatformerPlayer : MonoBehaviour {
         //pula caso a telca espaço esteja apertada e o personagem esteja no chão
         if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
         {
+            _anim.SetBool("isGrounded", true);
+            Debug.Log("jumping");
             _body.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         }
     }

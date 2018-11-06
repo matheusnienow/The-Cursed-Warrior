@@ -9,24 +9,21 @@ public class PlatformerPlayer : MonoBehaviour {
 
     private Rigidbody2D _body;
     private Animator _anim;
-    private Collider2D _box;
+    private Collider2D _coll;
 
+    public LayerMask layerMask;
 
-    /// <summary>
-    /// ARRUMAR O ANIMATION CONTROLLER PARA A ANIMAÇÃO DE JUMP, SETAR A VARIAVEL BOLEANA DE UMA MANEIRA QUE VÁ FUNCIONAR
-    /// </summary>
+    private bool isGrounded = true;
 
-    // Use this for initialization
     void Start () {
         _body = GetComponent<Rigidbody2D>();
         _anim = GetComponent<Animator>();
-        _box = GetComponent<CapsuleCollider2D>();
+        _coll = GetComponent<CapsuleCollider2D>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
         float deltaX = Input.GetAxis("Horizontal") * speed * Time.deltaTime;
-
         HandleMovement(deltaX);
         HandleJump();
         HandleSpriteInvertion(deltaX);
@@ -43,27 +40,16 @@ public class PlatformerPlayer : MonoBehaviour {
 
     private bool IsGrounded()
     {
-        Vector3 max = _box.bounds.max;
-        Vector3 min = _box.bounds.min;
-        Vector2 corner1 = new Vector2(max.x, min.y - 0.1f);
-        Vector2 corner2 = new Vector2(min.x, min.y - 0.2f);
-        Collider2D hit = Physics2D.OverlapArea(corner1, corner2);
-        bool isGounded = false;
-        if (hit != null)
-        {
-            isGounded = true;
-        }
-
-        _anim.SetBool("isGrounded", isGounded);
-        return isGounded;
+        bool isGrounded = Physics2D.Raycast(transform.position, Vector3.down, _coll.bounds.extents.y + 0.1f, layerMask);
+        _anim.SetBool("isGrounded", isGrounded);
+        return isGrounded;
     }
 
     private void HandleJump()
     {
         //pula caso a telca espaço esteja apertada e o personagem esteja no chão
-        if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
+        if (Input.GetKeyDown(KeyCode.Space) & IsGrounded())
         {
-            _anim.SetBool("isGrounded", true);
             Debug.Log("jumping");
             _body.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         }

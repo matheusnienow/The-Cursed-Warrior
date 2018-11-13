@@ -14,6 +14,10 @@ public class PlatformerPlayer : MonoBehaviour {
     public LayerMask layerMask;
 
     private bool isGrounded = true;
+    private int noOfClicks = 0;
+    private float lastClickedTime = 0;
+    private float maxComboDelay = 1;
+    private float minComboDelay = 0;
 
     void Start () {
         _body = GetComponent<Rigidbody2D>();
@@ -27,6 +31,52 @@ public class PlatformerPlayer : MonoBehaviour {
         HandleMovement(deltaX);
         HandleJump();
         HandleSpriteInvertion(deltaX);
+        HandleAttack();
+    }
+
+    private void HandleAttack()
+    {
+        if (Time.time - lastClickedTime > maxComboDelay)
+        {
+            noOfClicks = 0;
+        }
+
+        var deltaTime = Time.time - lastClickedTime;
+        _anim.SetFloat("clickDeltaTime", deltaTime);
+
+        if (Input.GetKeyDown(KeyCode.J) & IsGrounded())
+        {
+            OnAttackButtonClick(deltaTime);
+        }
+
+        
+    }
+
+    private void OnAttackButtonClick(float deltaTime)
+    {
+        //Record time of last button click
+
+        if (noOfClicks == 0)
+        {
+            _anim.SetTrigger("attack1");
+            lastClickedTime = Time.time;
+            noOfClicks++;
+        }
+        else if (noOfClicks == 1 && deltaTime > 0.4)
+        {
+            _anim.SetTrigger("attack2");
+            lastClickedTime = Time.time;
+            noOfClicks++;
+        }
+        else if (noOfClicks == 2 && deltaTime > 0.5)
+        {
+            _anim.SetTrigger("attack3");
+            lastClickedTime = Time.time;
+            noOfClicks++;
+        }
+        
+        //limit/clamp no of clicks between 0 and 3 because you have combo for 3 clicks
+        noOfClicks = Mathf.Clamp(noOfClicks, 0, 3);
     }
 
     private void HandleMovement(float deltaX)

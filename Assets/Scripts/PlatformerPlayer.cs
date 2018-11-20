@@ -6,10 +6,12 @@ using UnityEngine;
 public class PlatformerPlayer : MonoBehaviour {
     public float speed = 250f;
     public float jumpForce = 12f;
+    public float Health = 100f;
 
     private Rigidbody2D _body;
     private Animator _anim;
     private Collider2D _coll;
+    private GameObject _hitbox;
 
     public LayerMask layerMask;
 
@@ -23,6 +25,7 @@ public class PlatformerPlayer : MonoBehaviour {
         _body = GetComponent<Rigidbody2D>();
         _anim = GetComponent<Animator>();
         _coll = GetComponent<CapsuleCollider2D>();
+        _hitbox = transform.Find("Hitbox").gameObject;
 	}
 	
 	// Update is called once per frame
@@ -48,7 +51,6 @@ public class PlatformerPlayer : MonoBehaviour {
         {
             OnAttackButtonClick(deltaTime);
         }
-
         
     }
 
@@ -74,9 +76,19 @@ public class PlatformerPlayer : MonoBehaviour {
             lastClickedTime = Time.time;
             noOfClicks++;
         }
-        
+
         //limit/clamp no of clicks between 0 and 3 because you have combo for 3 clicks
         noOfClicks = Mathf.Clamp(noOfClicks, 0, 3);
+    }
+
+    public void CastAttack()
+    {
+        _hitbox.SetActive(true);
+    }
+
+    public void StopAttack()
+    {
+        _hitbox.SetActive(false);
     }
 
     private void HandleMovement(float deltaX)

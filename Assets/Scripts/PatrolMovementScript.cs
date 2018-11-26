@@ -1,14 +1,14 @@
-﻿using System.Collections;
+﻿using Assets.Scripts;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SidewaysMovementScript : MonoBehaviour
+public class PatrolMovementScript : MonoBehaviour
 {
-    public float speed = 40f;
     private Rigidbody2D _body;
     private Animator _anim;
     private Collider2D _coll;
-    
+    private EnemyControllerScript _controller;
     private float side = -1;
     private float deltaTime = 0;
     public float secondsWalking = 3f;
@@ -21,14 +21,20 @@ public class SidewaysMovementScript : MonoBehaviour
         _body = GetComponent<Rigidbody2D>();
         _anim = GetComponent<Animator>();
         _coll = GetComponent<CapsuleCollider2D>();
+        _controller = GetComponent<EnemyControllerScript>();
     }
 	
 	// Update is called once per frame
 	void Update()
     {
+        if (_controller.State != EnemyState.PATROL)
+        {
+            return;
+        }
+
         deltaTime += Time.deltaTime;
-        float deltaX = side * speed * Time.deltaTime;
-        HandleMovement(deltaX);
+        _controller.DeltaX = side * _controller.Speed * Time.deltaTime;
+        HandleMovement(_controller.DeltaX);
     }
 
     void HandleMovement(float deltaX)
@@ -47,15 +53,6 @@ public class SidewaysMovementScript : MonoBehaviour
         {
             deltaTime = 0;
             side *= -1;
-        }
-        HandleSpriteInvertion(deltaX);
-    }
-
-    void HandleSpriteInvertion(float deltaX)
-    {
-        if (!Mathf.Approximately(deltaX, 0))
-        {
-            transform.localScale = new Vector3((Mathf.Sign(deltaX) * 0.8f) * -1f, 0.8f, 0.8f);
         }
     }
 

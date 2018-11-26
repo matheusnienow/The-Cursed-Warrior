@@ -2,18 +2,30 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class PlatformerPlayer : MonoBehaviour {
+public class PlayerController : MonoBehaviour {
+    [Header("Properties")]
     public float speed = 250f;
     public float jumpForce = 12f;
     public float Health = 100f;
+
+    [Header("UI")]
+    public Image HealthBar;
 
     private Rigidbody2D _body;
     private Animator _anim;
     private Collider2D _coll;
     private GameObject _hitbox;
 
-    public LayerMask layerMask;
+    private SpriteRenderer _rend;
+
+    private Shader shaderGUItext;
+    private Shader shaderSpritesDefault;
+
+    [Header("Other")]
+
+    public LayerMask GroundLayer;
 
     private bool isGrounded = true;
     private int noOfClicks = 0;
@@ -21,15 +33,28 @@ public class PlatformerPlayer : MonoBehaviour {
     private float maxComboDelay = 1;
     private float minComboDelay = 0;
 
+    private float fullHealth; 
+
     void Start () {
+        fullHealth = Health;
         _body = GetComponent<Rigidbody2D>();
         _anim = GetComponent<Animator>();
         _coll = GetComponent<CapsuleCollider2D>();
         _hitbox = transform.Find("Hitbox").gameObject;
-	}
+
+        _rend = gameObject.GetComponent<SpriteRenderer>();
+
+        shaderGUItext = Shader.Find("GUI/Text Shader");
+        shaderSpritesDefault = Shader.Find("Sprites/Default");
+    }
 	
 	// Update is called once per frame
 	void Update () {
+        if (PlayerManager.instance.IsPlayerDead())
+        {
+            return;
+        }
+
         float deltaX = Input.GetAxis("Horizontal") * speed * Time.deltaTime;
         HandleMovement(deltaX);
         HandleJump();
@@ -51,7 +76,45 @@ public class PlatformerPlayer : MonoBehaviour {
         {
             OnAttackButtonClick(deltaTime);
         }
-        
+
+    }
+
+    internal void ReceiveAttack(float baseDamage)
+    {
+        _anim.SetTrigger("Hurt");
+        Health -= baseDamage;
+        Debug.Log("Enemy health: " + Health);
+        StartCoroutine(FlashSprite());
+
+        HealthBar.fillAmount = Health / fullHealth;
+
+        if (Health <= 0)
+        {
+            _anim.SetBool("Dead", true);
+        }
+    }
+
+    public IEnumerator FlashSprite()
+    {
+        for (int n = 0; n < 2; n++)
+        {
+            WhiteSprite();
+            yield return new WaitForSeconds(0.1f);
+            NormalSprite();
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
+
+    private void WhiteSprite()
+    {
+        _rend.material.shader = shaderGUItext;
+        _rend.color = Color.white;
+    }
+
+    private void NormalSprite()
+    {
+        _rend.material.shader = shaderSpritesDefault;
+        _rend.color = Color.white;
     }
 
     private void OnAttackButtonClick(float deltaTime)
@@ -102,7 +165,7 @@ public class PlatformerPlayer : MonoBehaviour {
 
     private bool IsGrounded()
     {
-        bool isGrounded = Physics2D.Raycast(transform.position, Vector3.down, _coll.bounds.extents.y + 0.1f, layerMask);
+        bool isGrounded = Physics2D.Raycast(transform.position, Vector3.down, _coll.bounds.extents.y + 0.1f, GroundLayer);
         _anim.SetBool("isGrounded", isGrounded);
         return isGrounded;
     }
@@ -112,7 +175,6 @@ public class PlatformerPlayer : MonoBehaviour {
         //pula caso a telca espaço esteja apertada e o personagem esteja no chão
         if (Input.GetKeyDown(KeyCode.Space) & IsGrounded())
         {
-            Debug.Log("jumping");
             _body.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         }
     }
@@ -123,7 +185,13 @@ public class PlatformerPlayer : MonoBehaviour {
         if (!Mathf.Approximately(deltaX, 0))
         {
             transform.localScale = new Vector3(Mathf.Sign(deltaX), 1, 1);
+            HealthBar.fillOrigin = (int)(Mathf.Sign(deltaX) == 1 ? Image.OriginHorizontal.Left : Image.OriginHorizontal.Right);
         }
 
+    }
+
+    public void Die()
+    {
+        gameObject.SetActive(false);
     }
 }

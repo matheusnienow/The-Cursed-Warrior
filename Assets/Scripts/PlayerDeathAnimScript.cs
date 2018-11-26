@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Attack1Script : StateMachineBehaviour {
-
-    PlayerController script;
+public class PlayerDeathAnimScript : StateMachineBehaviour {
 
 	 // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
 	override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        script = animator.GetComponentInParent<PlayerController>();
-        script.CastAttack();
+        GameManager.instance.OnPlayerDeath();
+        animator.enabled = false;
     }
 
 	// OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
@@ -19,8 +17,7 @@ public class Attack1Script : StateMachineBehaviour {
 
 	// OnStateExit is called when a transition ends and the state machine finishes evaluating this state
 	override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        script = animator.GetComponentInParent<PlayerController>();
-        script.StopAttack();
+        
 	}
 
 	// OnStateMove is called right after Animator.OnAnimatorMove(). Code that processes and affects root motion should be implemented here

@@ -24,9 +24,10 @@ GameObject:
   - component: {fileID: 50629610500187832}
   - component: {fileID: 114834533209983790}
   - component: {fileID: 70967828130945218}
+  - component: {fileID: 114919752893969962}
   m_Layer: 0
   m_Name: EnemyGhost
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -103,13 +104,26 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1989510767201504}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ee7a933e12fb5ef478fc28ebabd5b84b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 40
   secondsWalking: 3
+--- !u!114 &114919752893969962
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1989510767201504}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ab307d257a55374e88007fa31709456, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Health: 200
+  BaseDamage: 25
 --- !u!212 &212632749816529228
 SpriteRenderer:
   m_ObjectHideFlags: 1

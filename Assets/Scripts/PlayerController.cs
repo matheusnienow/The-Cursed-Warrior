@@ -86,7 +86,7 @@ public class PlayerController : MonoBehaviour {
         Debug.Log("Enemy health: " + Health);
         StartCoroutine(FlashSprite());
 
-        HealthBar.fillAmount = Health / fullHealth;
+        UpdateHealthBar();
 
         if (Health <= 0)
         {
@@ -156,10 +156,16 @@ public class PlayerController : MonoBehaviour {
 
     private void HandleMovement(float deltaX)
     {
-        //move o personagem
-        Vector2 movement = new Vector2(deltaX, _body.velocity.y);
-        _body.velocity = movement;
-        //seta a velocidade no parâmetro do animator
+        if (!GameManager.instance.GameWon)
+        {
+            //move o personagem
+            Vector2 movement = new Vector2(deltaX, _body.velocity.y);
+            _body.velocity = movement;
+            //seta a velocidade no parâmetro do animator
+        } else
+        {
+            deltaX = 0;
+        }
         _anim.SetFloat("speed", Mathf.Abs(deltaX));
     }
 
@@ -185,13 +191,25 @@ public class PlayerController : MonoBehaviour {
         if (!Mathf.Approximately(deltaX, 0))
         {
             transform.localScale = new Vector3(Mathf.Sign(deltaX), 1, 1);
-            HealthBar.fillOrigin = (int)(Mathf.Sign(deltaX) == 1 ? Image.OriginHorizontal.Left : Image.OriginHorizontal.Right);
+            
         }
+        //HealthBar.fillOrigin = (int)(Mathf.Sign(deltaX) == 1 ? Image.OriginHorizontal.Left : Image.OriginHorizontal.Right);
 
+    }
+
+    private void UpdateHealthBar()
+    {
+        HealthBar.fillAmount = Health / fullHealth;
     }
 
     public void Die()
     {
         gameObject.SetActive(false);
+    }
+
+    public void OnHealthPotion()
+    {
+        Health = fullHealth;
+        UpdateHealthBar();
     }
 }

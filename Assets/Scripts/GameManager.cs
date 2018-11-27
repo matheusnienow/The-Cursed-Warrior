@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -16,13 +17,18 @@ public class GameManager : MonoBehaviour {
     #endregion
 
     public GameObject deathPanel;
+    public GameObject victoryPanel;
+
     private GameObject player;
     private Scene currentScene;
+
+    public bool GameWon { get; private set; }
 
     // Use this for initialization
     void Start () {
         player = PlayerManager.instance.Player;
         currentScene = SceneManager.GetActiveScene();
+        GameWon = false;
 	}
 	
 	// Update is called once per frame
@@ -52,6 +58,12 @@ public class GameManager : MonoBehaviour {
 
             currentScene = scene;
         }
+    }
+
+    public void PlayerWin()
+    {
+        victoryPanel.SetActive(true);
+        GameWon = true;
     }
 
 }
